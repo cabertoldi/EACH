@@ -45,15 +45,13 @@ def regression(Xt, Yt, k):
         erro = S - Yt
         grad = np.matmul(erro.T, Xt)
         norm = np.linalg.norm(grad.flatten())
-        grad_norm = np.divide(grad, norm)
 
-        alpha = bisection(W, grad_norm, Xt, Yt)
-        W = W - alpha * grad_norm
+        alpha = bisection(W, grad, Xt, Yt)
+        W = W - alpha * grad
 
         loss = cross_entropy(Yt, S)
 
         f.write(f"it: {idx}, grad_norm: {norm}, cross_entropy: {loss}\n")
-
         idx += 1
 
 

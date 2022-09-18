@@ -41,9 +41,8 @@ def regression(Xt, Yt, k):
         erro = S - Yt
         grad = np.matmul(erro.T, Xt)
         norm  = np.linalg.norm(grad.flatten())
-        grad_norm = np.divide(grad, norm)
 
-        W = W - alpha * grad_norm
+        W = W - alpha * grad
         
         loss = cross_entropy(Yt, S)
 
