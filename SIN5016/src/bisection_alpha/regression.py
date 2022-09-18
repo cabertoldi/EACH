@@ -30,14 +30,15 @@ def regression(Xt, Yt, k):
     S = softmax(np.matmul(Xt, W.T))
     erro = S - Yt
     grad = np.matmul(erro.T, Xt)
-    grad_norm = np.linalg.norm(grad.flatten())
+    norm = np.linalg.norm(grad)
+    grad_norm = np.divide(grad, norm)
 
     idx = 0
     idx_max = 1000
     loss = 1e-5
 
     f = open("output_bisection_alpha.txt","w+")
-    while grad_norm > loss and idx <= idx_max:
+    while norm > loss and idx <= idx_max:
         idx += 1
 
         S = softmax(np.matmul(Xt, W.T))
@@ -56,13 +57,13 @@ def regression(Xt, Yt, k):
 
 
 def h_l(alpha, W, grad, Xt, Yt):
-    Wi = W - alpha * (-grad)
+    Wi = W - alpha * grad
     S = softmax(np.matmul(Xt, Wi.T))
     
     erro = S - Yt
     grad_alpha = np.matmul(erro.T, Xt).flatten()
 
-    result = np.dot(grad_alpha.T, -grad.flatten())
+    result = np.dot(grad_alpha.T, grad.flatten())
     print(result)
     return result
 
