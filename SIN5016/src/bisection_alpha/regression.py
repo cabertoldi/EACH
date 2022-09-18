@@ -23,37 +23,38 @@ def main():
 
     return regression(Xt, Yt, k)
 
+
 def regression(Xt, Yt, k):
     _, d = Xt.shape
 
+    alpha = 1e-5
     W = np.random.rand(k, d)
+
     S = softmax(np.matmul(Xt, W.T))
     erro = S - Yt
     grad = np.matmul(erro.T, Xt)
-    norm = np.linalg.norm(grad)
-    grad_norm = np.divide(grad, norm)
-
+    norm = np.linalg.norm(grad.flatten())
+    
     idx = 0
     idx_max = 1000
     loss = 1e-5
 
     f = open("output_bisection_alpha.txt","w+")
     while norm > loss and idx <= idx_max:
-        idx += 1
-
         S = softmax(np.matmul(Xt, W.T))
         erro = S - Yt
         grad = np.matmul(erro.T, Xt)
-        norm = np.linalg.norm(grad)
+        norm = np.linalg.norm(grad.flatten())
         grad_norm = np.divide(grad, norm)
 
         alpha = bisection(W, grad_norm, Xt, Yt)
-        print("alpha", alpha)
         W = W - alpha * grad_norm
 
         loss = cross_entropy(Yt, S)
 
         f.write(f"it: {idx}, grad_norm: {norm}, cross_entropy: {loss}\n")
+
+        idx += 1
 
 
 def h_l(alpha, W, grad, Xt, Yt):
@@ -63,9 +64,7 @@ def h_l(alpha, W, grad, Xt, Yt):
     erro = S - Yt
     grad_alpha = np.matmul(erro.T, Xt).flatten()
 
-    result = np.dot(grad_alpha.T, grad.flatten())
-    print(result)
-    return result
+    return np.dot(grad_alpha.T, grad.flatten())
 
 def h(alpha, W, grad, Xt, Yt):
     Wi = W - alpha * grad
@@ -83,16 +82,12 @@ def bisection(W, grad, Xt, Yt):
 
     alpha_l = 0
     alpha_u = alpha_gen()
-    print('alpha_u', alpha_u)
     alpha = (alpha_l + alpha_u) / 2
 
     hl = h_l(alpha, W, grad, Xt, Yt)
-    print('hl', hl)
 
     it = 0
-    it_max = np.int(np.ceil(np.log(alpha_u - alpha_l) - np.log(1e-5))/np.log(2))
-    print('it_max', it_max)
-    # while abs(hl) > 1e-5:
+    it_max = int(np.ceil(np.log(alpha_u - alpha_l) - np.log(1e-5))/np.log(2))
     while (it < it_max):
         it += 1
         if hl > 0:
