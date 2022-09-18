@@ -1,0 +1,5 @@
+# Basic packages used in many of the tutorials.
+# pip3 install -r requirements.txt
+
+pandas==1.4.4
+numpy==1.23.3
