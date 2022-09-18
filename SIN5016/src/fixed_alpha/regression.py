@@ -6,6 +6,11 @@ def main():
     
     X = iris.iloc[:, 0:4].values
     Y = iris.iloc[:, -1].values
+
+    x_max = X.max(axis=0)
+    x_min = X.min(axis=0)
+    X = (X - x_min)/(x_max - x_min)
+
     Xt = np.hstack([X, np.ones((len(X), 1))])
 
     k = len(np.unique(Y))
@@ -27,25 +32,23 @@ def regression(Xt, Yt, k):
     S = softmax(np.matmul(Xt, W.T), N)
     erro = S - Yt
     grad = np.matmul(erro.T, Xt)
-    loss_values = []
-
-    grad_norm = np.linalg.norm(grad.flatten())
+    norm = np.linalg.norm(grad.flatten())
 
     f = open("output_fixed_alpha.txt","w+")
     it = 0
-    while grad_norm > 1e-5 and it <= 1000:
-        W = W - alpha * grad
-
+    while norm > 1e-5 and it <= 1000:
         S = softmax(np.matmul(Xt, W.T), N)
         erro = S - Yt
         grad = np.matmul(erro.T, Xt)
-        grad_norm  = np.linalg.norm(grad.flatten())
+        norm  = np.linalg.norm(grad.flatten())
+        grad_norm = np.divide(grad, norm)
 
+        W = W - alpha * grad_norm
+        
         loss = cross_entropy(Yt, S)
-        loss_values.append(loss)
 
+        f.write(f"it: {it}, grad_norm: {norm}, cross_entropy: {loss}\n")
         it += 1
-        f.write(f"it: {it}, grad_norm: {grad_norm}, cross_entropy: {loss}\n")
 
 def softmax(S, N):
     expY = np.exp(S)
