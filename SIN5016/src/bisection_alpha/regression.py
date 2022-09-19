@@ -27,7 +27,6 @@ def main():
 def regression(Xt, Yt, k):
     _, d = Xt.shape
 
-    alpha = 1e-5
     W = np.random.rand(k, d)
 
     S = softmax(np.matmul(Xt, W.T))
@@ -40,7 +39,7 @@ def regression(Xt, Yt, k):
     loss = 1e-5
 
     f = open("output_bisection_alpha.txt","w+")
-    while norm > loss and idx <= idx_max:
+    while norm > 1e-5 and idx <= idx_max:
         S = softmax(np.matmul(Xt, W.T))
         erro = S - Yt
         grad = np.matmul(erro.T, Xt)
@@ -62,19 +61,13 @@ def h_l(alpha, W, grad, Xt, Yt):
     erro = S - Yt
     grad_alpha = np.matmul(erro.T, Xt).flatten()
 
-    return np.dot(grad_alpha.T, grad.flatten())
-
-def h(alpha, W, grad, Xt, Yt):
-    Wi = W - alpha * grad
-    S = softmax(np.matmul(Xt, Wi.T))
-
-    return cross_entropy(Yt, S)
+    return np.dot(grad_alpha.T, -grad.flatten())
 
 def bisection(W, grad, Xt, Yt): 
     def alpha_gen():
         alpha_g = np.random.rand()
         while h_l(alpha_g, W, grad, Xt, Yt) < 0:
-            alpha_g = np.random.rand()
+            alpha_g = alpha_g * 2
 
         return alpha_g
 
