@@ -24,12 +24,12 @@ def main():
     return regression(Xt, Yt, k)
 
 def regression(Xt, Yt, k):
-    N, d = Xt.shape
+    _, d = Xt.shape
 
     alpha = 1e-5
     W = np.random.rand(k, d)
 
-    S = softmax(np.matmul(Xt, W.T), N)
+    S = softmax(np.matmul(Xt, W.T))
     erro = S - Yt
     grad = np.matmul(erro.T, Xt)
     norm = np.linalg.norm(grad.flatten())
@@ -37,7 +37,7 @@ def regression(Xt, Yt, k):
     f = open("output_fixed_alpha.txt","w+")
     it = 0
     while norm > 1e-5 and it <= 1000:
-        S = softmax(np.matmul(Xt, W.T), N)
+        S = softmax(np.matmul(Xt, W.T))
         erro = S - Yt
         grad = np.matmul(erro.T, Xt)
         norm  = np.linalg.norm(grad.flatten())
@@ -49,9 +49,9 @@ def regression(Xt, Yt, k):
         f.write(f"it: {it}, grad_norm: {norm}, cross_entropy: {loss}\n")
         it += 1
 
-def softmax(S, N):
+def softmax(S):
     expY = np.exp(S)
-    return  expY / np.sum(expY, axis=1).reshape(N, 1)
+    return  expY / np.sum(expY, axis=1).reshape(S.shape[0], 1)
 
 def cross_entropy(Yt, S):
     return -np.sum(np.multiply(Yt, np.log(S)))
