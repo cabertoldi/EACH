@@ -31,13 +31,11 @@ def regression(Xt, Yt, k, classes):
     S = softmax(np.matmul(Xt, W.T))
     erro = S - Yt
     grad = np.matmul(erro.T, Xt)
-    print('grad', grad)
+    norm = np.linalg.norm(grad.flatten())
 
     hessian = np.linalg.inv(calculate_hessian(Xt, S, classes))
     direction = np.matmul(hessian, grad)
-    
-    norm = np.linalg.norm(direction.flatten())
-    
+      
     idx = 0
     idx_max = 1000
     loss = 1e-5
@@ -47,11 +45,10 @@ def regression(Xt, Yt, k, classes):
         S = softmax(np.matmul(Xt, W.T))
         erro = S - Yt
         grad = np.matmul(erro.T, Xt)
+        norm = np.linalg.norm(grad.flatten())
         
-        hessian = np.linalg.inv(calculate_hessian(Xt, grad, classes))
+        hessian = np.linalg.inv(calculate_hessian(Xt, S, classes))
         direction = np.matmul(hessian, grad)
-        
-        norm = np.linalg.norm(direction.flatten())
 
         alpha = bisection(W, direction, Xt, Yt)
         W = W + alpha * direction
@@ -93,16 +90,13 @@ def calculate_hessian(Xt, S, classes):
     I = np.identity(classes, dtype=float)
     H = np.zeros((classes, classes))
 
-    N, d = Xt.shape
-    features = d - 1
+    N, _ = Xt.shape
  
     for n in range(0, N):
-        for l in range(0, classes):
-            for i in range(0, classes):
-                for m in range(0, features):
-                    for j in range(0, features):
-                        indentity = I[l, i] - S[n, i]
-                        H[l, i] += indentity * S[n, l] * Xt[n, m] * Xt[n, j]
+        for k in range(0, classes):
+            for j in range(0, classes):
+                indentity = I[k, j] - S[n, j]
+                H[k, j] += indentity * Xt[n, j] * Xt[n, j].T
 
     H = -H
 
@@ -125,7 +119,7 @@ def h_l(alpha, W, grad, Xt, Yt):
     erro = S - Yt
     grad_alpha = np.matmul(erro.T, Xt).flatten()
 
-    return np.dot(grad_alpha.T, -grad.flatten())
+    return np.dot(grad_alpha.T, grad.flatten())
 
 def softmax(S):
     expY = np.exp(S)

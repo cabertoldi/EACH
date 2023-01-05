@@ -65,7 +65,7 @@ def h_l(alpha, W, grad, Xt, Yt):
 
 def bisection(W, grad, Xt, Yt): 
     def alpha_gen():
-        alpha_g = np.random.rand()
+        alpha_g = np.random.random()
         while h_l(alpha_g, W, grad, Xt, Yt) < 0:
             alpha_g = alpha_g * 2
 
